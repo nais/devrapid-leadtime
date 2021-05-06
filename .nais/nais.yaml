@@ -30,7 +30,5 @@ spec:
   requests:
     cpu: "200m"
     memory: "256Mi"
-  envFrom:
-    - secret: github-webhook
   kafka:
     pool: nav-infrastructure
