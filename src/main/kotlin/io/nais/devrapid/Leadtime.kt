@@ -22,7 +22,7 @@ import org.slf4j.event.Level
 private val LOGGER = LoggerFactory.getLogger("devrapid-leadtime")
 
 
-fun Application.leadtime() {
+suspend fun Application.leadtime() {
     install(CallLogging) {
         level = Level.INFO
         filter { call ->
@@ -52,5 +52,8 @@ fun Application.leadtime() {
     routing {
         nais()
     }
+    val configuration = Configuration()
+    LeadtimeCalculator(configuration).run()
+
 
 }
