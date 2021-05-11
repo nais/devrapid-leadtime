@@ -37,7 +37,6 @@ class LeadtimeCalculator(val configuration: Configuration) {
 
         while (true) {
             val records = consumer.poll(Duration.ofSeconds(1))
-            LOGGER.info("Received ${records.count()} messages")
             records.iterator().forEach {
                 val push = it.parsePushMessage()
                 push?.let {
