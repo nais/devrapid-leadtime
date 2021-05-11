@@ -41,13 +41,13 @@ class LeadtimeCalculator(val configuration: Configuration) {
                 val push = it.parsePushMessage()
                 push?.let {
                     messages[push.latestCommitSha] = push
-                    LOGGER.info("Received push message (repo: ${push.repositoryName} sha: ${push.latestCommitSha})")
+                    LOGGER.info("Received push message (repo: ${push.repositoryName} sha: ${push.latestCommitSha}) ${push.toString()}")
                 }
                 if (push == null) {
                     val deploy = it.parseDeploymentEvent()
                     deploy?.let {
                         val key = deploy.gitCommitSha
-                        LOGGER.info("Received deploy message (app: ${deploy.application} sha: ${deploy.gitCommitSha})")
+                        LOGGER.info("Received deploy message (app: ${deploy.application} sha: ${deploy.gitCommitSha}) ${deploy.toString()}")
                         if (deploy.rolloutStatus == RolloutStatus.complete && messages.containsKey(key)) {
                             computeLeadTime(messages[key]!!, deploy)
                             messages.remove(key)
@@ -63,7 +63,6 @@ class LeadtimeCalculator(val configuration: Configuration) {
         val leadTime = deploy.timestamp.seconds - push.webHookRecieved.seconds.toDouble()
         LOGGER.info("Lead time for ${push.repositoryName} is $leadTime")
         leadTimeGauge.labels(push.repositoryName).set(leadTime)
-
 
     }
 }
