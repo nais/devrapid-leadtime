@@ -16,13 +16,14 @@ import io.micrometer.core.instrument.binder.system.ProcessorMetrics
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import io.prometheus.client.CollectorRegistry
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 
 private val LOGGER = LoggerFactory.getLogger("devrapid-leadtime")
 
 
-suspend fun Application.leadtime() {
+fun Application.leadtime() {
     install(CallLogging) {
         level = Level.INFO
         filter { call ->
@@ -53,7 +54,9 @@ suspend fun Application.leadtime() {
         nais()
     }
     val configuration = Configuration()
-    LeadtimeCalculator(configuration).run()
+    launch {
+        LeadtimeCalculator(configuration).run()
+    }
 
 
 }
