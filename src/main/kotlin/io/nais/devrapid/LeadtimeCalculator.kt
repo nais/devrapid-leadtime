@@ -30,30 +30,33 @@ class LeadtimeCalculator(val configuration: Configuration) {
     private val LOGGER = LoggerFactory.getLogger("devrapid-leadtime")
 
 
-    suspend fun run() = coroutineScope {
-        launch {
+    fun run() {
+        LOGGER.info("Started consumer thread")
+        consumer.subscribe(listOf(configuration.topic))
+        val messages: MutableMap<String, Message.Push> = mutableMapOf()
 
-            consumer.subscribe(listOf(configuration.topic))
-            val messages: MutableMap<String, Message.Push> = mutableMapOf()
-
-            while (true) {
-                val records = consumer.poll(Duration.ofSeconds(1))
-                records.iterator().forEach {
-                    val push = it.parsePushMessage()
-                    push?.let { messages[push.latestCommitSha] = push }
-                    if (push == null) {
-                        val deploy = it.parseDeploymentEvent()
-                        deploy?.let {
-                            val key = deploy.gitCommitSha
-                            if (deploy.rolloutStatus == RolloutStatus.complete && messages.containsKey(key)) {
-                                computeLeadTime(messages[key]!!, deploy)
-                                messages.remove(key)
-                            }
+        while (true) {
+            val records = consumer.poll(Duration.ofSeconds(1))
+            LOGGER.info("Received ${records.count()} messages")
+            records.iterator().forEach {
+                val push = it.parsePushMessage()
+                push?.let {
+                    messages[push.latestCommitSha] = push
+                    LOGGER.info("Received push message (sha: ${push.latestCommitSha})")
+                }
+                if (push == null) {
+                    val deploy = it.parseDeploymentEvent()
+                    deploy?.let {
+                        val key = deploy.gitCommitSha
+                        LOGGER.info("Received deploy message (sha: ${deploy.gitCommitSha})")
+                        if (deploy.rolloutStatus == RolloutStatus.complete && messages.containsKey(key)) {
+                            computeLeadTime(messages[key]!!, deploy)
+                            messages.remove(key)
                         }
                     }
                 }
-                messageMapSize.set(messages.keys.size.toDouble())
             }
+            messageMapSize.set(messages.keys.size.toDouble())
         }
     }
 
@@ -81,7 +84,4 @@ private fun ConsumerRecord<String, ByteArray>.parseDeploymentEvent(): Deployment
         null
     }
 }
-
-
-
 
