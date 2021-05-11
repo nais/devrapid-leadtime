@@ -23,8 +23,8 @@ fun setProps(): Properties {
     props["ssl.keystore.type"] = "PKCS12"
     props["ssl.keystore.location"] = config()[Key("KAFKA_KEYSTORE_PATH", stringType)]
     props["ssl.keystore.password"] = config()[Key("KAFKA_CREDSTORE_PASSWORD", stringType)]
-    props["key.serializer"] = "org.apache.kafka.common.serialization.StringSerializer"
-    props["value.serializer"] = "org.apache.kafka.common.serialization.ByteArraySerializer"
+    props["key.deserializer"] = "org.apache.kafka.common.serialization.StringSerializer"
+    props["value.deserializer"] = "org.apache.kafka.common.serialization.ByteArraySerializer"
     return props
 
 }
