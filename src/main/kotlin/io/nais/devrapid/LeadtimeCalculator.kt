@@ -21,6 +21,12 @@ class LeadtimeCalculator(val configuration: Configuration) {
             .labelNames("repo")
             .help("Lead time from Github push to completed deployment")
             .create()
+    private val messageMapSize =
+        Gauge.build()
+            .name("message_map_size")
+            .help("Size of map that holds messages (deploy and push)")
+            .create()
+
     private val LOGGER = LoggerFactory.getLogger("devrapid-leadtime")
 
 
@@ -46,6 +52,7 @@ class LeadtimeCalculator(val configuration: Configuration) {
                         }
                     }
                 }
+                messageMapSize.set(messages.keys.size.toDouble())
             }
         }
     }

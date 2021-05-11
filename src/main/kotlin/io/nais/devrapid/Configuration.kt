@@ -16,8 +16,6 @@ fun setProps(): Properties {
 
     props["bootstrap.servers"] = config()[Key("KAFKA_BROKERS", stringType)]
     props["security.protocol"] = "SSL"
-    props["schema.registry.url"] = config()[Key("KAFKA_SCHEMA_REGISTRY", stringType)]
-    props["basic.auth.credentials.source"] = "USER_INFO"
     props["ssl.truststore.location"] = config()[Key("KAFKA_TRUSTSTORE_PATH", stringType)]
     props["ssl.truststore.password"] = config()[Key("KAFKA_CREDSTORE_PASSWORD", stringType)]
     props["ssl.keystore.type"] = "PKCS12"

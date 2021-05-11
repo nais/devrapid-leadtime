@@ -58,5 +58,4 @@ fun Application.leadtime() {
         LeadtimeCalculator(configuration).run()
     }
 
-
 }
