@@ -4,7 +4,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.LoggerFactory
 import java.time.Duration
 
-class LeadtimeCalculator(val configuration: Configuration) {
+class LeadTimeKafkaConsumer(val configuration: Configuration) {
 
     private val consumer = KafkaConsumer<String, ByteArray>(configuration.props)
     private val LOGGER = LoggerFactory.getLogger("devrapid-leadtime")

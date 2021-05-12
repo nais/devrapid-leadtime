@@ -55,7 +55,7 @@ fun Application.leadtime() {
     }
     val configuration = Configuration()
     launch {
-        LeadtimeCalculator(configuration).run()
+        LeadTimeKafkaConsumer(configuration).run()
     }
 
 }
