@@ -3,18 +3,29 @@ package io.nais.devrapid
 import com.google.protobuf.Timestamp
 import io.nais.devrapid.github.Message
 import no.nav.protos.deployment.DeploymentEvent
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import com.google.protobuf.Any
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 
 class ProtoMessageTest{
     @Test
     fun `should parse`(){
-        val messageProto = pushMessageProto()
-        val deployProto = deploymentProto()
-        val parsed = Message.Push.parseFrom(deployProto.toByteArray())
-        assertThat(messageProto).isEqualTo(parsed)
+        val pushMessageProto = pushMessageProto()
+        val anyByteArray = Any.parseFrom(Any.pack(pushMessageProto).toByteArray())
+        assertTrue(anyByteArray.`is`((Message.Push::class.java)))
+        assertFalse(anyByteArray.`is`((DeploymentEvent.Event::class.java)))
+        assertThat(anyByteArray.unpack(Message.Push::class.java)).isEqualTo(pushMessageProto)
+
+        val deploymentProto = deploymentProto()
+        val anyDeploymentByteArray =  Any.parseFrom(Any.pack(deploymentProto).toByteArray())
+        assertTrue(anyDeploymentByteArray.`is`((DeploymentEvent.Event::class.java)))
+        assertFalse(anyDeploymentByteArray.`is`((Message.Push::class.java)))
+        assertThat(anyDeploymentByteArray.unpack(DeploymentEvent.Event::class.java)).isEqualTo(deploymentProto)
+
     }
 
     private fun deploymentProto(): DeploymentEvent.Event {
