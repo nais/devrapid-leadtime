@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 
 class EventCollector {
 
-    private val memory = mutableMapOf<String, Message.Push>()
+    private val messages = mutableMapOf<String, Message.Push>()
     private val LOGGER = LoggerFactory.getLogger("devrapid-leadtime")
 
     private val leadTimeGauge = Gauge.build()
@@ -18,7 +18,7 @@ class EventCollector {
         .help("Lead time from Github push to completed deployment")
         .create()
 
-    private val memorySize = Gauge.build()
+    private val messageSize = Gauge.build()
         .name("message_map_size")
         .help("Size of map that holds messages (deploy and push)")
         .create()
@@ -30,18 +30,18 @@ class EventCollector {
             any.`is`(Message.Push::class.java) -> {
                 val push = any.unpack(Message.Push::class.java)
                 LOGGER.info("Received push message (repo: ${push.repositoryName} sha: ${push.latestCommitSha})")
-                memory[push.latestCommitSha] = push
-                updateMemorySizeGauge()
+                messages[push.latestCommitSha] = push
+                updateMessageSizeGauge()
             }
             any.`is`(DeploymentEvent.Event::class.java) -> {
                 val deploy = any.unpack(DeploymentEvent.Event::class.java)
                 val sha = deploy.gitCommitSha
-                val push = memory[sha]
+                val push = messages[sha]
                 if (push != null && deploy.rolloutStatus == complete) {
                     LOGGER.info("Received deploy message (app: ${deploy.application} sha: ${sha})")
                     computeLeadTime(push, deploy)
-                    memory.remove(sha)
-                    updateMemorySizeGauge()
+                    messages.remove(sha)
+                    updateMessageSizeGauge()
                 } else {
                     LOGGER.info("Received deploy message (app: ${deploy.application} sha: ${sha}) with incomplete status: ${deploy.rolloutStatus}")
                 }
@@ -55,8 +55,8 @@ class EventCollector {
         leadTimeGauge.labels(push.repositoryName).set(leadTime.toDouble())
     }
 
-    private fun updateMemorySizeGauge() = memorySize.set(memory.keys.size.toDouble())
-    internal fun memorySize() = memory.size
+    private fun updateMessageSizeGauge() = messageSize.set(messages.keys.size.toDouble())
+    internal fun messageSize() = messages.size
 
 
 }
