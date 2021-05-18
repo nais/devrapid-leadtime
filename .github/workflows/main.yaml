@@ -7,6 +7,17 @@ env:
   "IMAGE": "docker.pkg.github.com/${{ github.repository }}/devrapid-leadtime:${{ github.sha\
     \ }}"
 jobs:
+  bigquery:
+    name: "Set up bigquery"
+    runs-on: "ubuntu-18.04"
+    steps:
+      - uses: "actions/checkout@v2"
+      - name: "Set up bigquery"
+        uses: "nais/deploy/actions/deploy@v1"
+        env:
+          "APIKEY": "${{ secrets.NAIS_DEPLOY_APIKEY }}"
+          "CLUSTER": "prod-gcp"
+          "RESOURCE": ".nais/bigquery.yaml"
   build:
     name: "build"
     runs-on: "ubuntu-18.04"
@@ -33,6 +44,7 @@ jobs:
     name: "Deploy to prod"
     needs:
       - "build"
+      - "bigquery"
     runs-on: "ubuntu-18.04"
     steps:
       - uses: "actions/checkout@v2"
@@ -42,3 +54,4 @@ jobs:
           "APIKEY": "${{ secrets.NAIS_DEPLOY_APIKEY }}"
           "CLUSTER": "prod-gcp"
           "RESOURCE": ".nais/nais.yaml"
+
