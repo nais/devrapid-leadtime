@@ -25,6 +25,12 @@ class EventCollector {
             .name("message_map_size")
             .help("Size of map that holds messages (deploy and push)")
             .register()
+
+        private val leadTimeFromBranchCreatedGauge = Gauge.build()
+            .name("deployment_leadtime_from_branch_created")
+            .labelNames("repo")
+            .help("Lead time from first commit on feature branch to completed deployment")
+            .register()
     }
 
     internal fun collectOrComputeLeadTime(byteArray: ByteArray) {
@@ -54,6 +60,10 @@ class EventCollector {
 
     private fun computeLeadTime(push: Message.Push, deploy: DeploymentEvent.Event) {
         val leadTime = deploy.timestamp.seconds - push.webHookRecieved.seconds
+        if (push.hasFirstBranchCommit()){
+            val leadTimeFromBranchCreated = deploy.timestamp.seconds - push.firstBranchCommit.seconds
+            leadTimeFromBranchCreatedGauge.labels(push.repositoryName).set(leadTimeFromBranchCreated.toDouble())
+        }
         LOGGER.info("Calculated lead time for deploy with sha ${push.latestCommitSha} in repo ${push.repositoryName} is $leadTime seconds")
         leadTimeGauge.labels(push.repositoryName).set(leadTime.toDouble())
     }

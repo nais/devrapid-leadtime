@@ -18,4 +18,5 @@ message Push {
   int32 filesModified = 12;
   repeated string commitMessages = 13;
   int32 coAuthors = 14;
+  google.protobuf.Timestamp firstBranchCommit = 15;
 }
