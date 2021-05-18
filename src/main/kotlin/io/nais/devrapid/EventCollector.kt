@@ -1,17 +1,20 @@
 package io.nais.devrapid
 
 import com.google.protobuf.Any
+import com.google.protobuf.Timestamp
 import io.nais.devrapid.github.Message
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Gauge
 import no.nav.protos.deployment.DeploymentEvent
 import no.nav.protos.deployment.DeploymentEvent.RolloutStatus.complete
 import org.slf4j.LoggerFactory
+import java.time.ZonedDateTime
 
 class EventCollector {
 
     private val messages = mutableMapOf<String, Message.Push>()
     private val LOGGER = LoggerFactory.getLogger("devrapid-leadtime")
+    private val bigquery = BigQuery()
 
     companion object {
         private val leadTimeGauge = Gauge.build()
@@ -49,6 +52,14 @@ class EventCollector {
                 if (push != null && deploy.rolloutStatus == complete) {
                     LOGGER.info("Received deploy message (app: ${deploy.application} sha: ${sha})")
                     computeLeadTime(push, deploy)
+                    bigquery.write(DeployHistoryRow(
+                        deploySha = deploy.gitCommitSha,
+                        repo = push.repositoryName,
+                        language = push.programmingLanguage,
+                        deployTime = deploy.timestamp.zonedTimestamp(),
+                        pushTime = push.webHookRecieved,
+                        firstCommitOnBranch = push.firstBranchCommit
+                    ))
                     messages.remove(sha)
                     updateMessageSizeGauge()
                 } else {
@@ -66,10 +77,14 @@ class EventCollector {
         }
         LOGGER.info("Calculated lead time for deploy with sha ${push.latestCommitSha} in repo ${push.repositoryName} is $leadTime seconds")
         leadTimeGauge.labels(push.repositoryName).set(leadTime.toDouble())
-    }
+    }ª
 
     private fun updateMessageSizeGauge() = messageSize.set(messages.keys.size.toDouble())
     internal fun messageSize() = messages.size
 
 
+}
+
+private fun Timestamp.zonedTimestamp(): ZonedDateTime {
+    this.seconds.
 }
