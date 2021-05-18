@@ -2,6 +2,7 @@ package io.nais.devrapid
 
 import com.google.protobuf.Any
 import io.nais.devrapid.github.Message
+import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Gauge
 import no.nav.protos.deployment.DeploymentEvent
 import no.nav.protos.deployment.DeploymentEvent.RolloutStatus.complete
@@ -16,12 +17,13 @@ class EventCollector {
         .name("deployment_leadtime")
         .labelNames("repo")
         .help("Lead time from Github push to completed deployment")
-        .create()
+        .register(CollectorRegistry.defaultRegistry)
+
 
     private val messageSize = Gauge.build()
         .name("message_map_size")
         .help("Size of map that holds messages (deploy and push)")
-        .create()
+        .register(CollectorRegistry.defaultRegistry)
 
 
     internal fun collectOrComputeLeadTime(byteArray: ByteArray) {
