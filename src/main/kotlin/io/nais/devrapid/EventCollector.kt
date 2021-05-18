@@ -13,18 +13,19 @@ class EventCollector {
     private val messages = mutableMapOf<String, Message.Push>()
     private val LOGGER = LoggerFactory.getLogger("devrapid-leadtime")
 
-    private val leadTimeGauge = Gauge.build()
-        .name("deployment_leadtime")
-        .labelNames("repo")
-        .help("Lead time from Github push to completed deployment")
-        .register(CollectorRegistry.defaultRegistry)
+    companion object {
+        private val leadTimeGauge = Gauge.build()
+            .name("deployment_leadtime")
+            .labelNames("repo")
+            .help("Lead time from Github push to completed deployment")
+            .register()
 
 
-    private val messageSize = Gauge.build()
-        .name("message_map_size")
-        .help("Size of map that holds messages (deploy and push)")
-        .register(CollectorRegistry.defaultRegistry)
-
+        private val messageSize = Gauge.build()
+            .name("message_map_size")
+            .help("Size of map that holds messages (deploy and push)")
+            .register()
+    }
 
     internal fun collectOrComputeLeadTime(byteArray: ByteArray) {
         val any = Any.parseFrom(byteArray)
