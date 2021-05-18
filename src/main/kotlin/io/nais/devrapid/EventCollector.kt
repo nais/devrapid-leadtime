@@ -8,13 +8,14 @@ import io.prometheus.client.Gauge
 import no.nav.protos.deployment.DeploymentEvent
 import no.nav.protos.deployment.DeploymentEvent.RolloutStatus.complete
 import org.slf4j.LoggerFactory
-import java.time.ZonedDateTime
+import java.time.*
+import java.time.Instant.ofEpochSecond
+import java.time.ZonedDateTime.ofInstant
 
 class EventCollector {
 
     private val messages = mutableMapOf<String, Message.Push>()
     private val LOGGER = LoggerFactory.getLogger("devrapid-leadtime")
-    private val bigquery = BigQuery()
 
     companion object {
         private val leadTimeGauge = Gauge.build()
@@ -36,7 +37,7 @@ class EventCollector {
             .register()
     }
 
-    internal fun collectOrComputeLeadTime(byteArray: ByteArray) {
+    internal fun collectOrComputeLeadTime(byteArray: ByteArray): DeployHistoryRow? {
         val any = Any.parseFrom(byteArray)
         when {
             any.`is`(Message.Push::class.java) -> {
@@ -44,6 +45,7 @@ class EventCollector {
                 LOGGER.info("Received push message (repo: ${push.repositoryName} sha: ${push.latestCommitSha})")
                 messages[push.latestCommitSha] = push
                 updateMessageSizeGauge()
+                return null
             }
             any.`is`(DeploymentEvent.Event::class.java) -> {
                 val deploy = any.unpack(DeploymentEvent.Event::class.java)
@@ -52,32 +54,31 @@ class EventCollector {
                 if (push != null && deploy.rolloutStatus == complete) {
                     LOGGER.info("Received deploy message (app: ${deploy.application} sha: ${sha})")
                     computeLeadTime(push, deploy)
-                    bigquery.write(DeployHistoryRow(
+                    messages.remove(sha)
+                    updateMessageSizeGauge()
+                    return DeployHistoryRow(
                         deploySha = deploy.gitCommitSha,
                         repo = push.repositoryName,
                         language = push.programmingLanguage,
                         deployTime = deploy.timestamp.zonedTimestamp(),
-                        pushTime = push.webHookRecieved,
-                        firstCommitOnBranch = push.firstBranchCommit
-                    ))
-                    messages.remove(sha)
-                    updateMessageSizeGauge()
-                } else {
-                    LOGGER.info("Received deploy message (app: ${deploy.application} sha: ${sha}) with incomplete status: ${deploy.rolloutStatus}")
+                        pushTime = push.webHookRecieved.zonedTimestamp(),
+                        firstCommitOnBranch = push.firstBranchCommit.zonedTimestamp()
+                    )
                 }
             }
         }
+        return null
     }
 
     private fun computeLeadTime(push: Message.Push, deploy: DeploymentEvent.Event) {
         val leadTime = deploy.timestamp.seconds - push.webHookRecieved.seconds
-        if (push.hasFirstBranchCommit()){
+        if (push.hasFirstBranchCommit()) {
             val leadTimeFromBranchCreated = deploy.timestamp.seconds - push.firstBranchCommit.seconds
             leadTimeFromBranchCreatedGauge.labels(push.repositoryName).set(leadTimeFromBranchCreated.toDouble())
         }
         LOGGER.info("Calculated lead time for deploy with sha ${push.latestCommitSha} in repo ${push.repositoryName} is $leadTime seconds")
         leadTimeGauge.labels(push.repositoryName).set(leadTime.toDouble())
-    }ª
+    }
 
     private fun updateMessageSizeGauge() = messageSize.set(messages.keys.size.toDouble())
     internal fun messageSize() = messages.size
@@ -86,5 +87,7 @@ class EventCollector {
 }
 
 private fun Timestamp.zonedTimestamp(): ZonedDateTime {
-    this.seconds.
+    return ofInstant(
+        ofEpochSecond(this.seconds), ZoneId.systemDefault()
+    )
 }

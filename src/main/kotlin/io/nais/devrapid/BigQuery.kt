@@ -46,11 +46,11 @@ fun toRow(deployHistoryRow: DeployHistoryRow): Map<String, Any> {
     )
 }
 
-data class DeployHistoryRow (
+data class DeployHistoryRow(
     val deploySha: String,
     val repo: String,
     val language: String,
     val deployTime: ZonedDateTime,
     val pushTime: ZonedDateTime,
     val firstCommitOnBranch: ZonedDateTime?
-        )
+)

@@ -8,6 +8,8 @@ class LeadTimeKafkaConsumer(val configuration: Configuration) {
 
     private val consumer = KafkaConsumer<String, ByteArray>(configuration.props)
     private val LOGGER = LoggerFactory.getLogger("devrapid-leadtime")
+    private val bigquery = BigQuery()
+
 
     fun run() {
         LOGGER.info("Started consumer thread")
@@ -15,7 +17,8 @@ class LeadTimeKafkaConsumer(val configuration: Configuration) {
         val collector = EventCollector()
         while (true) {
             val records = consumer.poll(Duration.ofSeconds(1))
-            records.iterator().forEach { collector.collectOrComputeLeadTime(it.value()) }
+            records.iterator()
+                .forEach { collector.collectOrComputeLeadTime(it.value())?.let { row -> bigquery.write(row) } }
         }
     }
 }
