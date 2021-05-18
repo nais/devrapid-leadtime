@@ -1,0 +1,99 @@
+apiVersion: bigquery.cnrm.cloud.google.com/v1beta1
+kind: BigQueryDataset
+metadata:
+  annotations:
+    cnrm.cloud.google.com/project-id: "nais-analyse-prod-2dcc"
+    cnrm.cloud.google.com/delete-contents-on-destroy: "false"
+  name: devrapid-leadtime
+  namespace: "nais-analyse"
+  labels:
+    "team": "nais-analyse"
+spec:
+  description: "Devrapid: Leadtime (between push and deploy)"
+  friendlyName: devrapid-leadtime
+  location: europe-north1
+  resourceID: devrapid-leadtime
+
+---
+
+apiVersion: bigquery.cnrm.cloud.google.com/v1beta1
+kind: BigQueryTable
+metadata:
+  annotations:
+    cnrm.cloud.google.com/project-id: "nais-analyse-prod-2dcc"
+  name: deploy-history
+  namespace: "nais-analyse"
+  labels:
+    "team": "nais-analyse"
+spec:
+  description: "History of deploys"
+  resourceID: deploy-history
+  datasetRef:
+    name: devrapid-leadtime
+  friendlyName: deploy-history
+  schema: |
+    [
+      {
+        "name": "deploySha",
+        "type": "STRING"
+      },
+      {
+        "name": "repo",
+        "type": "STRING"
+      },
+      {
+        "name": "language",
+        "type": "STRING"
+      },
+      {
+        "name": "deployTime",
+        "type": "TIMESTAMP"
+      },
+      {
+        "name": "pushTime",
+        "type": "TIMESTAMP"
+      },
+      {
+        "name": "firstCommitOnBranch",
+        "type": "TIMESTAMP",
+        "mode": "NULLABLE"
+      }
+    ]
+
+---
+
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMPolicyMember
+metadata:
+  annotations:
+    cnrm.cloud.google.com/project-id: "nais-analyse-prod-2dcc"
+  name: devrapid-leadtime-project-user
+  namespace: "nais-analyse"
+  labels:
+    "team": "nais-analyse"
+spec:
+  member: serviceAccount:devrapid-le-nais-analy-kwbhxaq@nais-prod-020f.iam.gserviceaccount.com
+  role: roles/bigquery.user
+  resourceRef:
+    apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+    kind: Project
+    external: projects/nais-analyse-prod-2dcc
+
+---
+
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMPolicyMember
+metadata:
+  annotations:
+    cnrm.cloud.google.com/project-id: "nais-analyse-prod-2dcc"
+  name: devrapid-leadtime-data-editor
+  namespace: "nais-analyse"
+  labels:
+    "team": "nais-analyse"
+spec:
+  member: serviceAccount:devrapid-le-nais-analy-kwbhxaq@nais-prod-020f.iam.gserviceaccount.com
+  role: roles/bigquery.dataEditor
+  resourceRef:
+    apiVersion: bigquery.cnrm.cloud.google.com/v1beta1
+    kind: BigQueryTable
+    external: projects/nais-analyse-prod-2dcc/datasets/devrapid-leadtime/tables/deploy-history
