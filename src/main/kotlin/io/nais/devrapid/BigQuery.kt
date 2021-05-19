@@ -52,12 +52,13 @@ data class DeployHistoryRow(
             "deployTime" to deployTime.asTimeStamp(),
             "pushTime" to pushTime.asTimeStamp(),
         )
-        firstCommitOnBranch?.let {
+
+        if (firstCommitOnBranch == null) {
+            map["firstCommitOnBranch"] = null
+        } else {
             map["firstCommitOnBranch"] = firstCommitOnBranch.asTimeStamp()
         }
         return map.toMap()
     }
-
     private fun ZonedDateTime.asTimeStamp() = ISO_LOCAL_DATE_TIME.format(this)
-
 }

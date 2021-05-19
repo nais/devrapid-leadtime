@@ -33,6 +33,6 @@ internal class BigQueryKtTest {
             pushTime = ZonedDateTime.now(),
             firstCommitOnBranch = null
         )
-        assertThat(row.asMap()).doesNotContainKey("firstCommitOnBranch")
+        assertThat(row.asMap()["firstCommitOnBranch"]).isNull()
     }
 }
