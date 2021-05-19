@@ -4,13 +4,13 @@ metadata:
   annotations:
     cnrm.cloud.google.com/project-id: "nais-analyse-prod-2dcc"
     cnrm.cloud.google.com/delete-contents-on-destroy: "false"
-  name: devrapid_leadtime
+  name: devrapid-leadtime
   namespace: "nais-analyse"
   labels:
     "team": "nais-analyse"
 spec:
   description: "Devrapid: Leadtime (between push and deploy)"
-  friendlyName: devrapid_leadtime
+  friendlyName: devrapid-leadtime
   location: europe-north1
   resourceID: devrapid_leadtime
 
@@ -21,7 +21,7 @@ kind: BigQueryTable
 metadata:
   annotations:
     cnrm.cloud.google.com/project-id: "nais-analyse-prod-2dcc"
-  name: deploy_history
+  name: deploy-history
   namespace: "nais-analyse"
   labels:
     "team": "nais-analyse"
