@@ -4,15 +4,15 @@ metadata:
   annotations:
     cnrm.cloud.google.com/project-id: "nais-analyse-prod-2dcc"
     cnrm.cloud.google.com/delete-contents-on-destroy: "false"
-  name: devrapid-leadtime
+  name: devrapid_leadtime
   namespace: "nais-analyse"
   labels:
     "team": "nais-analyse"
 spec:
   description: "Devrapid: Leadtime (between push and deploy)"
-  friendlyName: devrapid-leadtime
+  friendlyName: devrapid_leadtime
   location: europe-north1
-  resourceID: devrapid-leadtime
+  resourceID: devrapid_leadtime
 
 ---
 
@@ -21,15 +21,15 @@ kind: BigQueryTable
 metadata:
   annotations:
     cnrm.cloud.google.com/project-id: "nais-analyse-prod-2dcc"
-  name: deploy-history
+  name: deploy_history
   namespace: "nais-analyse"
   labels:
     "team": "nais-analyse"
 spec:
   description: "History of deploys"
-  resourceID: deploy-history
+  resourceID: deploy_history
   datasetRef:
-    name: devrapid-leadtime
+    name: devrapid_leadtime
   friendlyName: deploy-history
   schema: |
     [
@@ -96,4 +96,4 @@ spec:
   resourceRef:
     apiVersion: bigquery.cnrm.cloud.google.com/v1beta1
     kind: BigQueryTable
-    external: projects/nais-analyse-prod-2dcc/datasets/devrapid-leadtime/tables/deploy-history
+    external: projects/nais-analyse-prod-2dcc/datasets/devrapid_leadtime/tables/deploy_history
