@@ -6,12 +6,12 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
 class BigQuery {
-    val table = "deploy_history"
-    val dataset = "devrapid_leadtime"
-    val project = "nais-analyse-prod-2dcc"
-
+    private val table = "deploy_history"
+    private val dataset = "devrapid_leadtime"
+    private val project = "nais-analyse-prod-2dcc"
 
     private companion object {
         private val log = LoggerFactory.getLogger(BigQuery::class.java)
@@ -24,27 +24,17 @@ class BigQuery {
             .build().service
 
     fun write(deployHistoryRow: DeployHistoryRow): InsertAllResponse {
-        val builder = InsertAllRequest.newBuilder(TableId.of(dataset, table))
-        builder.addRow(toRow(deployHistoryRow))
-
-        val response = bigquery.insertAll(builder.build())
+        val response = bigquery.insertAll(
+            InsertAllRequest.newBuilder(TableId.of(dataset, table))
+                .addRow(deployHistoryRow.asMap())
+                .build()
+        )
         if (response.hasErrors()) response.insertErrors.entries.forEach { log.info("insertError: ${it.value}") }
-
         return response
     }
 
 }
 
-fun toRow(deployHistoryRow: DeployHistoryRow): Map<String, Any> {
-    return mapOf(
-        "deploySha" to deployHistoryRow.deploySha,
-        "repo" to deployHistoryRow.repo,
-        "language" to deployHistoryRow.language,
-        "deployTime" to DateTimeFormatter.ISO_ZONED_DATE_TIME.format(deployHistoryRow.deployTime),
-        "pushTime" to DateTimeFormatter.ISO_ZONED_DATE_TIME.format(deployHistoryRow.pushTime),
-        "firstCommitOnBranch" to DateTimeFormatter.ISO_ZONED_DATE_TIME.format(deployHistoryRow.firstCommitOnBranch)
-    )
-}
 
 data class DeployHistoryRow(
     val deploySha: String,
@@ -53,4 +43,21 @@ data class DeployHistoryRow(
     val deployTime: ZonedDateTime,
     val pushTime: ZonedDateTime,
     val firstCommitOnBranch: ZonedDateTime?
-)
+) {
+    fun asMap(): Map<String, String> {
+        val map = mutableMapOf(
+            "deploySha" to deploySha,
+            "repo" to repo,
+            "language" to language,
+            "deployTime" to deployTime.asTimeStamp(),
+            "pushTime" to pushTime.asTimeStamp(),
+        )
+        firstCommitOnBranch?.let {
+            map["firstCommitOnBranch"] = firstCommitOnBranch.asTimeStamp()
+        }
+        return map.toMap()
+    }
+
+    private fun ZonedDateTime.asTimeStamp() = ISO_LOCAL_DATE_TIME.format(this)
+
+}
