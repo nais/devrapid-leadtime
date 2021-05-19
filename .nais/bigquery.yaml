@@ -29,7 +29,7 @@ spec:
   description: "History of deploys"
   resourceID: deploy_history
   datasetRef:
-    name: devrapid_leadtime
+    name: devrapid-leadtime
   friendlyName: deploy-history
   schema: |
     [
