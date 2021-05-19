@@ -8,8 +8,8 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 class BigQuery {
-    val table = "deploy-history"
-    val dataset = "devrapid-leadtime"
+    val table = "deploy_history"
+    val dataset = "devrapid_leadtime"
     val project = "nais-analyse-prod-2dcc"
 
 
