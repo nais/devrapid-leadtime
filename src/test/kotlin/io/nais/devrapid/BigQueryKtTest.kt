@@ -3,6 +3,9 @@ package io.nais.devrapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
+import kotlin.test.assertFails
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 internal class BigQueryKtTest {
 
@@ -33,6 +36,7 @@ internal class BigQueryKtTest {
             pushTime = ZonedDateTime.now(),
             firstCommitOnBranch = null
         )
-        assertThat(row.asMap()["firstCommitOnBranch"]).isEqualTo("")
+        assertFalse { row.asMap().containsKey("firstCommitOnBranch") }
+        //assertThat(row.asMap()["firstCommitOnBranch"]).isEqualTo("")
     }
 }

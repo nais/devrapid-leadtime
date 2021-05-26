@@ -26,6 +26,7 @@ class BigQuery {
     fun write(deployHistoryRow: DeployHistoryRow): InsertAllResponse {
         val response = bigquery.insertAll(
             InsertAllRequest.newBuilder(TableId.of(dataset, table))
+                .setIgnoreUnknownValues(true)
                 .addRow(deployHistoryRow.asMap())
                 .build()
         )
@@ -53,12 +54,11 @@ data class DeployHistoryRow(
             "pushTime" to pushTime.asTimeStamp(),
         )
 
-        if (firstCommitOnBranch == null) {
-            map["firstCommitOnBranch"] = ""
-        } else {
+        if (firstCommitOnBranch != null) {
             map["firstCommitOnBranch"] = firstCommitOnBranch.asTimeStamp()
         }
         return map.toMap()
     }
+
     private fun ZonedDateTime.asTimeStamp() = ISO_LOCAL_DATE_TIME.format(this)
 }
