@@ -54,7 +54,7 @@ data class DeployHistoryRow(
         )
 
         if (firstCommitOnBranch == null) {
-            map["firstCommitOnBranch"] = null
+            map["firstCommitOnBranch"] = ""
         } else {
             map["firstCommitOnBranch"] = firstCommitOnBranch.asTimeStamp()
         }
