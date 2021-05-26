@@ -2,6 +2,7 @@ package io.nais.devrapid
 
 import com.google.cloud.bigquery.*
 import org.slf4j.LoggerFactory
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
@@ -63,5 +64,5 @@ data class DeployHistoryRow(
         return map.toMap()
     }
 
-    private fun ZonedDateTime.asTimeStamp() = ISO_LOCAL_DATE_TIME.format(this)
+    private fun ZonedDateTime.asTimeStamp() = ISO_LOCAL_DATE_TIME.format(this.withZoneSameInstant( ZoneId.of("UTC")))
 }
