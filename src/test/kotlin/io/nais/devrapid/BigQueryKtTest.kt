@@ -8,12 +8,12 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 internal class BigQueryKtTest {
+    val date = ZonedDateTime.parse("2021-05-19T09:09:01+02:00[Europe/Oslo]")
 
 
     @Test
     fun `date string is without zone`() {
 
-        val date = ZonedDateTime.parse("2021-05-19T09:09:01+02:00[Europe/Oslo]")
         val row = DeployHistoryRow(
             deploySha = "123",
             repo = "repo",
@@ -33,10 +33,10 @@ internal class BigQueryKtTest {
             repo = "repo",
             language = "language",
             deployTime = ZonedDateTime.now(),
-            pushTime = ZonedDateTime.now(),
+            pushTime = date,
             firstCommitOnBranch = null
         )
-        assertFalse { row.asMap().containsKey("firstCommitOnBranch") }
-        //assertThat(row.asMap()["firstCommitOnBranch"]).isEqualTo("")
+
+        assertThat(row.asMap()["firstCommitOnBranch"]).isEqualTo("2021-05-19T09:09:01")
     }
 }

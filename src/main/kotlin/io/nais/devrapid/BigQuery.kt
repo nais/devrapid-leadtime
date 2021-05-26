@@ -2,10 +2,7 @@ package io.nais.devrapid
 
 import com.google.cloud.bigquery.*
 import org.slf4j.LoggerFactory
-import java.sql.Timestamp
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
 class BigQuery {
@@ -24,11 +21,14 @@ class BigQuery {
             .build().service
 
     fun write(deployHistoryRow: DeployHistoryRow): InsertAllResponse {
+        val request = InsertAllRequest.newBuilder(TableId.of(dataset, table))
+            .setIgnoreUnknownValues(true)
+            .addRow(deployHistoryRow.asMap())
+            .build()
+
+
         val response = bigquery.insertAll(
-            InsertAllRequest.newBuilder(TableId.of(dataset, table))
-                .setIgnoreUnknownValues(true)
-                .addRow(deployHistoryRow.asMap())
-                .build()
+            request
         )
         if (response.hasErrors()) response.insertErrors.entries.forEach { log.info("insertError: ${it.value}") }
         return response
@@ -56,6 +56,9 @@ data class DeployHistoryRow(
 
         if (firstCommitOnBranch != null) {
             map["firstCommitOnBranch"] = firstCommitOnBranch.asTimeStamp()
+        } else {
+            map["firstCommitOnBranch"] = pushTime.asTimeStamp()
+
         }
         return map.toMap()
     }
