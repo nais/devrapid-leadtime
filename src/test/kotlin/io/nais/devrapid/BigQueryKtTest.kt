@@ -22,7 +22,7 @@ internal class BigQueryKtTest {
             pushTime = date,
             firstCommitOnBranch = date
         )
-        assertThat(row.asMap()["deployTime"]).isEqualTo("2021-05-19T09:09:01")
+        assertThat(row.asMap()["deployTime"]).isEqualTo("2021-05-19T07:09:01")
     }
 
     @Test
@@ -37,6 +37,6 @@ internal class BigQueryKtTest {
             firstCommitOnBranch = null
         )
 
-        assertThat(row.asMap()["firstCommitOnBranch"]).isEqualTo("2021-05-19T09:09:01")
+        assertThat(row.asMap()["firstCommitOnBranch"]).isEqualTo("2021-05-19T07:09:01")
     }
 }
