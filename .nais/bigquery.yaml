@@ -55,8 +55,7 @@ spec:
       },
       {
         "name": "firstCommitOnBranch",
-        "type": "TIMESTAMP",
-        "mode": "NULLABLE"
+        "type": "TIMESTAMP"
       }
     ]
 
