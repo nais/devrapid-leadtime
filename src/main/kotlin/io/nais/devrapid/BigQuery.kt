@@ -6,6 +6,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
+
 class BigQuery {
     private val table = "deploy_history"
     private val dataset = "devrapid_leadtime"
@@ -46,6 +47,10 @@ data class DeployHistoryRow(
     val pushTime: ZonedDateTime,
     val firstCommitOnBranch: ZonedDateTime?
 ) {
+    private companion object {
+        private val log = LoggerFactory.getLogger(DeployHistoryRow::class.java)
+    }
+
     fun asMap(): Map<String, String> {
         val map = mutableMapOf(
             "deploySha" to deploySha,
@@ -55,12 +60,12 @@ data class DeployHistoryRow(
             "pushTime" to pushTime.asTimeStamp(),
         )
 
+        log.info("FirstCommitOnBranch:$firstCommitOnBranch")
+
         if (firstCommitOnBranch != null) {
             map["firstCommitOnBranch"] = firstCommitOnBranch.asTimeStamp()
-        } else {
-            map["firstCommitOnBranch"] = pushTime.asTimeStamp()
-
         }
+
         return map.toMap()
     }
 

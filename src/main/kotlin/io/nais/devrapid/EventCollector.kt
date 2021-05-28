@@ -56,13 +56,14 @@ class EventCollector {
                     computeLeadTime(push, deploy)
                     messages.remove(sha)
                     updateMessageSizeGauge()
+
                     return DeployHistoryRow(
                         deploySha = deploy.gitCommitSha,
                         repo = push.repositoryName,
                         language = push.programmingLanguage,
                         deployTime = deploy.timestamp.zonedTimestamp(),
                         pushTime = push.webHookRecieved.zonedTimestamp(),
-                        firstCommitOnBranch = push.firstBranchCommit.zonedTimestamp()
+                        firstCommitOnBranch = if (push.hasFirstBranchCommit()) push.firstBranchCommit.zonedTimestamp() else null
                     )
                 }
             }

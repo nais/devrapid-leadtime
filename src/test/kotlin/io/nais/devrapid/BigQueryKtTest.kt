@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 import kotlin.test.assertFails
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 internal class BigQueryKtTest {
@@ -36,7 +37,7 @@ internal class BigQueryKtTest {
             pushTime = date,
             firstCommitOnBranch = null
         )
+        assertNull(row.asMap()["firstCommitOnBranch"])
 
-        assertThat(row.asMap()["firstCommitOnBranch"]).isEqualTo("2021-05-19T07:09:01")
     }
 }
