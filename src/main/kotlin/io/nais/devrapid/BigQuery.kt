@@ -1,6 +1,9 @@
 package io.nais.devrapid
 
-import com.google.cloud.bigquery.*
+import com.google.cloud.bigquery.BigQueryException
+import com.google.cloud.bigquery.BigQueryOptions
+import com.google.cloud.bigquery.InsertAllRequest
+import com.google.cloud.bigquery.TableId
 import org.slf4j.LoggerFactory
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -16,24 +19,27 @@ class BigQuery {
         private val log = LoggerFactory.getLogger(BigQuery::class.java)
     }
 
+    private val errorCounter = BiqQueryErrorCounter()
+
     private val bigquery =
         BigQueryOptions.newBuilder()
             .setLocation("europe-north1")
             .setProjectId(project)
-            .build().service
+            .build()
 
-    fun write(deployHistoryRow: DeployHistoryRow): InsertAllResponse {
+    fun write(deployHistoryRow: DeployHistoryRow) {
         val request = InsertAllRequest.newBuilder(TableId.of(dataset, table))
             .setIgnoreUnknownValues(true)
             .addRow(deployHistoryRow.asMap())
             .build()
 
-
-        val response = bigquery.insertAll(
-            request
-        )
-        if (response.hasErrors()) response.insertErrors.entries.forEach { log.info("insertError: ${it.value}") }
-        return response
+        try {
+            val response = bigquery.service.insertAll(request)
+            if (response.hasErrors()) response.insertErrors.entries.forEach { log.error("insertError: ${it.value}") }
+        } catch (e: BigQueryException) {
+            errorCounter.countError()
+            log.error(e.message)
+        }
     }
 
 }
@@ -69,5 +75,5 @@ data class DeployHistoryRow(
         return map.toMap()
     }
 
-    private fun ZonedDateTime.asTimeStamp() = ISO_LOCAL_DATE_TIME.format(this.withZoneSameInstant( ZoneId.of("UTC")))
+    private fun ZonedDateTime.asTimeStamp() = ISO_LOCAL_DATE_TIME.format(this.withZoneSameInstant(ZoneId.of("UTC")))
 }

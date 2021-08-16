@@ -24,7 +24,6 @@ class EventCollector {
             .help("Lead time from Github push to completed deployment")
             .register()
 
-
         private val messageSize = Gauge.build()
             .name("message_map_size")
             .help("Size of map that holds messages (deploy and push)")
