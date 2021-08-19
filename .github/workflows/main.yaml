@@ -44,6 +44,7 @@ jobs:
     name: "Deploy to prod"
     needs:
       - "build"
+      - "bigquery"
     runs-on: "ubuntu-18.04"
     steps:
       - uses: "actions/checkout@v2"
