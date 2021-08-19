@@ -39,6 +39,7 @@ class BigQuery {
         } catch (e: BigQueryException) {
             errorCounter.countError()
             log.error(e.message)
+            throw e
         }
     }
 

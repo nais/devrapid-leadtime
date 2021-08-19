@@ -6,7 +6,7 @@ class BiqQueryErrorCounter {
 
     companion object {
         private val errors = Counter.build()
-            .name("biquery_errors")
+            .name("bigquery_errors")
             .help("Errors from BiqQuery")
             .register()
     }
