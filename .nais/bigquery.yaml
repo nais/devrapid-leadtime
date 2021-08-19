@@ -12,6 +12,8 @@ spec:
   description: "Devrapid: Leadtime (between push and deploy)"
   friendlyName: devrapid-leadtime
   location: europe-north1
+  projectRef:
+    external: nais-analyse-prod-2dcc
   resourceID: devrapid_leadtime
 
 ---
