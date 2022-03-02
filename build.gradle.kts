@@ -13,7 +13,6 @@ apply(plugin = "com.google.protobuf")
 
 
 repositories {
-    jcenter()
     maven("https://jitpack.io")
     maven("https://packages.confluent.io/maven/")
     mavenCentral()
