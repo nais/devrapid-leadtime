@@ -3,9 +3,9 @@ import com.google.protobuf.gradle.protobuf
 import com.google.protobuf.gradle.protoc
 
 plugins {
-    kotlin("jvm") version ("1.4.32")
-    kotlin("plugin.serialization") version "1.4.32"
-    id("com.google.protobuf") version "0.8.16"
+    kotlin("jvm") version ("1.6.10")
+    kotlin("plugin.serialization") version "1.6.10"
+    id("com.google.protobuf") version "0.8.18"
     application
 }
 
@@ -25,28 +25,26 @@ configurations {
     }
 }
 
-val junitVersion = "5.6.1"
-val ktorVersion = "1.3.2"
+val junitVersion = "5.8.2"
+val ktorVersion = "1.6.7"
 val log4jVersion = "2.17.0"
-val assertJVersion = "3.18.1"
-val prometheusVersion = "0.9.0"
-val micrometerVersion = "1.5.2"
+val assertJVersion = "3.22.0"
+val prometheusVersion = "0.15.0"
+val micrometerVersion = "1.8.2"
 val serializerVersion = "0.20.0"
-val protobufVersion = "3.6.1"
-
-
+val protobufVersion = "3.19.4"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.20")
     implementation("com.natpryce:konfig:1.6.10.0")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.4.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.0")
     implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
     implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:$log4jVersion")
-    implementation("com.vlkan.log4j2:log4j2-logstash-layout-fatjar:0.19")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+    implementation("com.vlkan.log4j2:log4j2-logstash-layout-fatjar:1.0.5")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serializerVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$serializerVersion")
     implementation("io.ktor:ktor-metrics-micrometer:$ktorVersion")
@@ -55,19 +53,19 @@ dependencies {
     implementation("io.ktor:ktor-auth:$ktorVersion")
     implementation("io.ktor:ktor-serialization:$ktorVersion")
     implementation("commons-codec:commons-codec:1.15")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
     implementation("org.apache.kafka:kafka-clients:2.8.0")
     implementation("io.confluent:kafka-protobuf-serializer:6.1.1")
-    implementation ("com.google.cloud:google-cloud-bigquery:1.127.11"){
+    implementation ("com.google.cloud:google-cloud-bigquery:2.9.0"){
         exclude(group="com.fasterxml.jackson.core", module = "jackson-core")
     }
-    compile("com.google.protobuf:protobuf-java:$protobufVersion")
+    api("com.google.protobuf:protobuf-java:$protobufVersion")
     protobuf(files("src/main/protobuf/"))
     testImplementation("org.assertj:assertj-core:$assertJVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("org.assertj:assertj-core:$assertJVersion")
-    testImplementation("io.ktor:ktor-server-test-host:1.5.2")
+    testImplementation("io.ktor:ktor-server-test-host:1.6.7")
 
 }
 java {
