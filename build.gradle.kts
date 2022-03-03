@@ -30,7 +30,6 @@ val log4jVersion = "2.17.0"
 val assertJVersion = "3.22.0"
 val prometheusVersion = "0.15.0"
 val micrometerVersion = "1.8.2"
-val serializerVersion = "0.20.0"
 val protobufVersion = "3.19.4"
 
 dependencies {
